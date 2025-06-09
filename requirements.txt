@@ -1,0 +1,44 @@
+# Core Dependencies
+Flask
+pandas
+openpyxl
+xlrd
+python-dotenv
+openai
+fuzzywuzzy
+python-Levenshtein
+
+# Development Dependencies
+pytest
+pytest-cov
+black
+flake8
+python-dotenv
+
+# Runtime Dependencies
+Werkzeug
+Jinja2
+MarkupSafe
+itsdangerous
+click
+blinker
+
+# Data Processing
+numpy
+python-dateutil
+pytz
+tzdata
+
+# Excel/CSV Handling
+openpyxl
+xlrd
+
+# Environment Management
+python-dotenv
+
+# AI/ML
+openai
+
+# Fuzzy Matching
+fuzzywuzzy
+python-Levenshtein

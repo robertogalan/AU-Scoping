@@ -1,0 +1,602 @@
+{% extends "base.html" %}
+
+{% block title %}Materiality and Scoping - Account Mapping Tool{% endblock %}
+
+{% block extra_css %}
+<style>
+    .results-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .benchmark-info, .materiality-summary {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .benchmark-info h5, .materiality-summary h5 {
+        font-weight: var(--font-light);
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .scope-summary .card {
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .scope-summary .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .scope-summary .card-body {
+        padding: 1.5rem;
+    }
+    
+    .scope-summary h6 {
+        font-weight: 400;
+        margin-bottom: 0.5rem;
+    }
+    
+    .scope-summary h3 {
+        font-weight: 300;
+        margin-bottom: 0;
+    }
+    
+    .scope-summary .bg-info {
+        background-color: #0d6efd !important;
+    }
+    
+    .table-container {
+        margin-top: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table th {
+        font-weight: 400;
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .table td, .table th {
+        padding: 12px 15px;
+        vertical-align: middle;
+    }
+    
+    .badge {
+        font-weight: 400;
+        padding: 6px 10px;
+        border-radius: 4px;
+    }
+    
+    .bg-primary {
+        background-color: #0d6efd !important;
+    }
+    
+    .btn-success {
+        background-color: #198754;
+        border-color: #198754;
+    }
+    
+    .btn-success:hover {
+        background-color: #157347;
+        border-color: #146c43;
+    }
+    
+    .form-label {
+        font-weight: 400;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        padding: 10px 15px;
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+        font-weight: 300;
+    }
+    
+    .form-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .progress {
+        height: 8px;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+    
+    .progress-bar {
+        background-color: #0d6efd;
+    }
+    
+    .nav-tabs {
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: 20px;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        font-weight: 400;
+        padding: 10px 20px;
+        margin-right: 5px;
+        border-radius: 4px 4px 0 0;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #0d6efd;
+        background-color: #fff;
+        border-bottom: 2px solid #0d6efd;
+    }
+    
+    .nav-tabs .nav-link:hover:not(.active) {
+        background-color: #f8f9fa;
+    }
+    
+    .tab-content {
+        padding: 20px;
+        background: #fff;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1rem 1.25rem;
+    }
+    
+    .card-header h4, .card-header h5 {
+        margin: 0;
+        font-weight: 300;
+    }
+    
+    .help-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+    
+    .text-muted {
+        color: #6c757d !important;
+    }
+    
+    .alert {
+        border: none;
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+    }
+    
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+    
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #58151c;
+    }
+    
+    .alert-success {
+        background-color: #d1e7dd;
+        color: #0a3622;
+    }
+    
+    .btn-outline-primary {
+        color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: #fff;
+    }
+    
+    .btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #5c636a;
+        border-color: #565e64;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="results-container">
+    <div class="header">
+        <div class="d-flex justify-content-center align-items-center gap-3">
+            <h1 class="font-ultralight mb-0">Materiality and Scoping</h1>
+            <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#materialityHelpModal" style="line-height: 1;">
+                <i class="bi bi-question-circle fs-4 text-muted"></i>
+            </button>
+        </div>
+        <p class="text-muted font-ultralight">Set materiality thresholds and review account scoping</p>
+    </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'message' else 'info' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% if step == 'upload_mapped_file_prompt' %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0 font-ultralight">Upload Mapped File for Materiality</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    It seems you've navigated directly to the materiality step or an issue occurred previously.
+                    Please upload your mapped Excel or CSV file to continue with the materiality calculation.
+                </p>
+                <form method="POST" action="{{ url_for('upload_for_materiality') }}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Mapped Data File (.xlsx, .xls, .csv)</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".xlsx,.xls,.csv" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Upload and Proceed</button>
+                </form>
+            </div>
+        </div>
+
+        {% elif step == 'set_parameters' %}
+        <!-- Step 1: Set Materiality Parameters (This was the original content when step was not 'review_scoping') -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 font-ultralight">Set Materiality Parameters</h4>
+                <span class="text-muted">Step 1 of 3</span>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('calculate_materiality_route') }}">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="benchmark_type" class="form-label">Benchmark Type</label>
+                            <select class="form-select" id="benchmark_type" name="benchmark_type" required>
+                                <option value="total" {{ 'selected' if request.form.benchmark_type == 'total' else '' }}>Total (e.g., Assets)</option>
+                                <option value="specific_accounts" {{ 'selected' if request.form.benchmark_type == 'specific_accounts' else '' }}>Specific Accounts (e.g., Revenue)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="benchmark_column" class="form-label">Benchmark Account/Column</label>
+                            <select class="form-select" id="benchmark_column" name="benchmark_column" required>
+                                <option value="" disabled {{ 'selected' if not request.form.benchmark_column and not benchmark_column }}>Select column...</option>
+                                <optgroup label="Numeric Columns (for 'Total' benchmark)">
+                                    {% if numeric_columns %}
+                                        {% for col in numeric_columns %}
+                                            <option value="{{ col }}" {{ 'selected' if request.form.benchmark_column == col or benchmark_column == col }}>{{ col }}</option>
+                                        {% endfor %}
+                                    {% else %}
+                                        <option value="Balance" disabled>No numeric columns found</option>
+                                    {% endif %}
+                                </optgroup>
+                                <optgroup label="Specific Account Names (for 'Specific Accounts' benchmark)">
+                                    {% for acc_name in specific_benchmark_names %}
+                                        <option value="{{ acc_name }}" {{ 'selected' if request.form.benchmark_column == acc_name or benchmark_column == acc_name }}>{{ acc_name }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            </select>
+                            <div class="form-text">Select column or account name.</div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="percentage" class="form-label">Overall Mat. (%)</label>
+                            <input type="number" class="form-control" id="percentage" name="percentage" value="{{ request.form.percentage if request.form.percentage else '5.0' }}" step="0.1" min="0" max="100" required>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label for="pm_percentage" class="form-label">Perf. Mat. (%)</label>
+                            <input type="number" class="form-control" id="pm_percentage" name="pm_percentage" value="{{ request.form.pm_percentage if request.form.pm_percentage else '75.0' }}" step="0.1" min="0" max="100" required>
+                            <div class="form-text">As % of Overall Mat.</div>
+                        </div>
+                        <div class="col-md-2 mb-3 align-self-end">
+                            <button type="submit" class="btn btn-primary w-100">Calculate Materiality</button>
+                        </div>
+                    </div>
+                </form>
+
+                {% if materiality_results %}
+                <hr class="my-4">
+                <h5 class="font-light mb-3">Calculated Materiality Results:</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-7">Benchmark Used:</dt>
+                            <dd class="col-sm-5">{{ materiality_results.get('benchmark_name') if materiality_results.get('benchmark_name') is not none else 'N/A' }}</dd>
+
+                            <dt class="col-sm-7">Benchmark Value:</dt>
+                            <dd class="col-sm-5">{% if materiality_results.get('benchmark_value') is not none %}{{ "{:,.2f}".format(materiality_results.get('benchmark_value')) }}{% else %}N/A{% endif %}</dd>
+
+                            <dt class="col-sm-7">Percentage Applied to Benchmark:</dt>
+                            <dd class="col-sm-5">{% if materiality_results.get('percentage_used') is not none %}{{ materiality_results.get('percentage_used') }}%{% else %}N/A{% endif %}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-7">Overall Materiality (OM):</dt>
+                            <dd class="col-sm-5 fw-bold">{% if materiality_results.get('overall_materiality') is not none %}{{ "{:,.2f}".format(materiality_results.get('overall_materiality')) }}{% else %}N/A{% endif %}</dd>
+
+                            <dt class="col-sm-7">Performance Materiality ({% if materiality_results.get('performance_materiality_percentage') is not none %}{{ materiality_results.get('performance_materiality_percentage') }}%{% else %}N/A{% endif %} of OM):</dt>
+                            <dd class="col-sm-5 fw-bold">{% if materiality_results.get('performance_materiality') is not none %}{{ "{:,.2f}".format(materiality_results.get('performance_materiality')) }}{% else %}N/A{% endif %}</dd>
+
+                            <dt class="col-sm-7">Clearly Trivial Threshold (CTT):</dt>
+                            <dd class="col-sm-5">{% if materiality_results.get('clearly_trivial_threshold') is not none %}{{ "{:,.2f}".format(materiality_results.get('clearly_trivial_threshold')) }}{% else %}N/A{% endif %}</dd>
+                        </dl>
+                    </div>
+                </div>
+                {% endif %}
+            </div> <!-- End card-body -->
+        </div> <!-- End Materiality Calculation card -->
+        {% elif step == 'review_scoping' %}
+        <!-- Step 2: Review Materiality and Scoping Results -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 font-ultralight">Materiality Calculation</h4>
+                <span class="text-muted">Step 2 of 3</span>
+            </div>
+            <div class="card-body">
+                <div class="benchmark-info">
+                    <h5>Benchmark Information</h5>
+                    <p>Benchmark Type: <strong>{{ benchmark_info.type }}</strong></p>
+                    <p>Benchmark Column/Account: <strong>{{ benchmark_info.column }}</strong></p>
+                    <p>Benchmark Value: <strong>{{ '%.2f'|format(benchmark_info.value) }}</strong></p>
+                    <p>Applied Percentage: <strong>{{ '%.1f'|format(benchmark_info.percentage) }}%</strong></p>
+                </div>
+                
+                <div class="materiality-summary">
+                    <h5>Materiality Summary</h5>
+                    <p>Materiality: <strong>{{ '%.2f'|format(materiality_info['materiality']) }}</strong></p>
+                    <p>Performance Materiality ({{ '%.1f'|format(materiality_info['pm_percentage']) }}%): <strong>{{ '%.2f'|format(materiality_info['performance_materiality']) }}</strong></p>
+                </div>
+                
+                <div class="scope-summary">
+                    <h5>Scoping Results</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6>Total Accounts</h6>
+                                    <h3>{{ scope_summary['total'] }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h6>In Scope</h6>
+                                    <h3>{{ scope_summary['in_scope'] }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-secondary text-white">
+                                <div class="card-body text-center">
+                                    <h6>Out of Scope</h6>
+                                    <h3>{{ scope_summary['out_of_scope'] }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="post" action="{{ url_for('finalize_scoping') }}" class="mt-4">
+                    <button type="submit" class="btn btn-success">Finalize Scoping</button>
+                    <a href="{{ url_for('set_materiality') }}" class="btn btn-secondary">Adjust Parameters</a>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Account List with Scoping Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4>Account Scoping Details</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th>Number</th>
+                                <th>Balance</th>
+                                <th>Global Mapping</th>
+                                <th>Specific Mapping</th>
+                                <th>Quantitative</th>
+                                <th>Qualitative</th>
+                                <th>Final Scope</th>
+                                <th>Justification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for account in accounts %}
+                            <tr>
+                                <td>{{ account['Account_Name'] }}</td>
+                                <td>{{ account['Account_Number'] }}</td>
+                                <td>{{ '%.2f'|format(account['Balance']) }}</td>
+                                <td>{{ account['Global_Mapping'] }}</td>
+                                <td>{{ account['Specific_Mapping'] }}</td>
+                                <td>
+                                    <span class="badge {{ 'bg-primary' if account['Quantitative_Scope'] == 'In Scope' else 'bg-secondary' }}">
+                                        {{ account['Quantitative_Scope'] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge {{ 'bg-primary' if account['Qualitative_Scope'] == 'In Scope' else 'bg-secondary' }}">
+                                        {{ account['Qualitative_Scope'] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge {{ 'bg-primary' if account['Final_Scope'] == 'In Scope' else 'bg-secondary' }}">
+                                        {{ account['Final_Scope'] }}
+                                    </span>
+                                </td>
+                                <td>{{ account['Scope_Justification'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if step == 'final' %}
+        <!-- Step 3: Finalized Scoping -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-success text-white">
+                <h4 class="mb-0 font-ultralight">Scoping Complete</h4>
+                <span>Step 3 of 3</span>
+            </div>
+            <div class="card-body">
+                <h5 class="mb-3">Scoping has been successfully completed!</h5>
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <div>
+                        <p><strong>File:</strong> {{ output_filename }}</p>
+                        <p><strong>Total Accounts:</strong> {{ scope_summary.total }}</p>
+                        <p><strong>In Scope:</strong> {{ scope_summary.in_scope }} ({{ '%.1f'|format(scope_summary.in_scope_percentage) }}%)</p>
+                    </div>
+                    <div>
+                        <p><strong>Materiality:</strong> {{ '%.2f'|format(materiality_info.materiality) }}</p>
+                        <p><strong>Performance Materiality:</strong> {{ '%.2f'|format(materiality_info.performance_materiality) }}</p>
+                        <p><strong>Benchmark:</strong> {{ benchmark_info.column }} ({{ '%.1f'|format(benchmark_info.percentage) }}%)</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-center">
+                    <a href="{{ url_for('download_scoped') }}" class="btn btn-primary me-3">Download Scoped File</a>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">Start New Analysis</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Help Modal -->
+        <div class="modal fade" id="materialityHelpModal" tabindex="-1" aria-labelledby="materialityHelpModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="materialityHelpModalLabel">Materiality Calculation Help</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>How Materiality is Calculated:</h6>
+                        <p>Materiality is calculated based on a percentage of the selected benchmark. The formula is:</p>
+                        <p class="text-center fw-bold">Materiality = Benchmark Value × Materiality Percentage</p>
+                        
+                        <h6 class="mt-4">Benchmark Types:</h6>
+                        <ul>
+                            <li><strong>Total Column:</strong> Uses the sum of all values in the selected column</li>
+                            <li><strong>Specific Accounts:</strong> Uses the sum of values from accounts matching the selected mapping</li>
+                        </ul>
+                        
+                        <h6 class="mt-4">Performance Materiality:</h6>
+                        <p>Performance materiality is typically set at 50-75% of overall materiality to provide a buffer for undetected misstatements.</p>
+                        
+                        <h6 class="mt-4">Account Scoping:</h6>
+                        <p>Accounts are considered in scope if they meet any of these criteria:</p>
+                        <ul>
+                            <li>Balance exceeds performance materiality</li>
+                            <li>High risk of material misstatement</li>
+                            <li>Significant risk factors present</li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div> <!-- This closes results-container -->
+{% endblock %}
+
+{% block extra_js %}
+    <!-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const benchmarkTypeSelect = document.getElementById('benchmark_type');
+            const benchmarkColumnSelect = document.getElementById('benchmark_column');
+            
+            if (benchmarkTypeSelect && benchmarkColumnSelect) {
+                const optgroups = benchmarkColumnSelect.querySelectorAll('optgroup');
+                const numericOptgroup = optgroups.length > 0 ? optgroups[0] : null; // Should be 'Numeric Columns'
+                const specificOptgroup = optgroups.length > 1 ? optgroups[1] : null; // Should be 'Specific Account Names'
+
+                function updateBenchmarkColumnDisplay() {
+                    const selectedType = benchmarkTypeSelect.value;
+                    console.log('Benchmark type changed to: ' + selectedType);
+                    
+                    if (numericOptgroup) numericOptgroup.style.display = 'none';
+                    if (specificOptgroup) specificOptgroup.style.display = 'none';
+
+                    if (selectedType === 'total') {
+                        if (numericOptgroup) numericOptgroup.style.display = '';
+                        // Try to select the first option in this group if nothing is selected, or 'Balance' if available
+                        if (benchmarkColumnSelect.value === "" || !isOptionInGroup(benchmarkColumnSelect.value, numericOptgroup)) {
+                            const balanceOption = numericOptgroup ? numericOptgroup.querySelector('option[value="Balance"]') : null;
+                            if (balanceOption) {
+                                benchmarkColumnSelect.value = 'Balance';
+                            } else if (numericOptgroup && numericOptgroup.options.length > 0) {
+                                benchmarkColumnSelect.value = numericOptgroup.options[0].value;
+                            }
+                        }
+                    } else if (selectedType === 'specific_accounts') {
+                        if (specificOptgroup) specificOptgroup.style.display = '';
+                        // Try to select the first option in this group if nothing is selected
+                        if (benchmarkColumnSelect.value === "" || !isOptionInGroup(benchmarkColumnSelect.value, specificOptgroup)) {
+                           if (specificOptgroup && specificOptgroup.options.length > 0) {
+                                benchmarkColumnSelect.value = specificOptgroup.options[0].value;
+                           }
+                        }
+                    }
+                }
+
+                function isOptionInGroup(optionValue, optgroup) {
+                    if (!optgroup) return false;
+                    for (let i = 0; i < optgroup.options.length; i++) {
+                        if (optgroup.options[i].value === optionValue) return true;
+                    }
+                    return false;
+                }
+
+                benchmarkTypeSelect.addEventListener('change', updateBenchmarkColumnDisplay);
+                
+                // Trigger change event on page load to set initial state and pre-select if possible
+                updateBenchmarkColumnDisplay();
+            }
+        });
+    </script> -->
+{% endblock %}
