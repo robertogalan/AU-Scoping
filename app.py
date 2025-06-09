@@ -1,5 +1,6 @@
 import os
 import uuid
+from dotenv import load_dotenv
 from flask import Flask, request, render_template, redirect, url_for, flash, session, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 import pandas as pd
@@ -7,6 +8,9 @@ import numpy as np
 from utils.excel_processor import process_excel_file, save_mapped_excel
 from utils.ai_mapper import identify_columns, classify_accounts
 from utils.scoping import calculate_materiality, calculate_performance_materiality, scope_accounts, save_scoped_excel
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev_key_for_mapping_app')
