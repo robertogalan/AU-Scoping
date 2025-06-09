@@ -49,9 +49,12 @@
                         <li>OpenAI GPT-4 classifies accounts into financial statement categories (Asset, Liability, Equity, Revenue, Expense)</li>
                         <li>Accounts are mapped to specific audit areas (Cash, Receivables, PPE, etc.) using fuzzy matching algorithms</li>
                         <li>Set materiality benchmarks and percentages for audit planning</li>
-                        <li>Calculate overall materiality, performance materiality, and clearly trivial thresholds</li>
+                        <li>Calculate overall materiality using configurable percentage of selected benchmark (revenue, net income, total assets)</li>
+                        <li>Derive performance materiality at 75% of overall materiality for substantive testing</li>
+                        <li>Set clearly trivial threshold at 5% of overall materiality for error evaluation</li>
                         <li>Generate scoped account listing based on materiality thresholds for audit procedures</li>
-                        <li>Export processed files with complete mapping and scoping classifications</li>
+                        <li>Accounts above performance materiality threshold are automatically marked "In Scope" for detailed testing</li>
+                        <li>Export processed files with complete mapping, scoping classifications, and materiality calculations</li>
                     </ol>
                 </div>
             </div>
