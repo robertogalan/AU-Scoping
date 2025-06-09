@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'au-scoping',
       script: 'app.py',
-      interpreter: 'python3',
+      interpreter: '/home/ubuntu/AU-Scoping/venv/bin/python',
       cwd: '/home/ubuntu/AU-Scoping',
       env: {
         FLASK_ENV: 'production',
