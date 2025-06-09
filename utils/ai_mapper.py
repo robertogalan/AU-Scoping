@@ -8,8 +8,15 @@ from openai import OpenAI
 from fuzzywuzzy import fuzz, process
 from collections import defaultdict
 
-# Initialize OpenAI client with environment variable
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+# OpenAI client will be initialized when needed
+client = None
+
+def get_openai_client():
+    """Initialize OpenAI client if not already done"""
+    global client
+    if client is None:
+        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+    return client
 
 # Model configuration
 AI_MODEL = "gpt-4.1-mini"  # Using the specified model
@@ -278,7 +285,7 @@ def _ai_identify_columns(df: pd.DataFrame) -> Dict[str, Any]:
         # Call OpenAI API to identify columns
         try:
             # First try the chat completions API
-            response = client.chat.completions.create(
+            response = get_openai_client().chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": """You are an AI assistant specialized in accounting data analysis. 
@@ -936,7 +943,7 @@ Be concise and only return the JSON object."""
             try:
                 # Make the API call for this single account
                 start_time = time.time()
-                response = client.chat.completions.create(
+                response = get_openai_client().chat.completions.create(
                     model=AI_MODEL,
                     messages=[
                         {"role": "system", "content": "You are an AI assistant specialized in accounting classification."},
